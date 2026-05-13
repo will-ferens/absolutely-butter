@@ -1,0 +1,15 @@
+{
+  "name": "absolutely-butter",
+  "private": true,
+  "scripts": {
+    "dev:server": "pnpm --filter @ab/server dev",
+    "dev:dashboard": "pnpm --filter @ab/dashboard dev",
+    "typecheck": "pnpm -r tsc --noEmit",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "tsx": "^4.10.5",
+    "vitest": "^1.6.0"
+  }
+}

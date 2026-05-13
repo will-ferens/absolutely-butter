@@ -1,0 +1,28 @@
+node_modules/
+dist/
+.next/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+*.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# pnpm
+.pnpm-debug.log
+
+# Build info
+*.tsbuildinfo
+
+# Claude Code
+.claude/
