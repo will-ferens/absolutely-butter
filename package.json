@@ -5,11 +5,21 @@
     "dev:server": "pnpm --filter @ab/server dev",
     "dev:dashboard": "pnpm --filter @ab/dashboard dev",
     "typecheck": "pnpm -r tsc --noEmit",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "test:db": "vitest run supabase/tests --reporter=verbose",
+    "db:push": "supabase db push",
+    "db:diff": "supabase db diff --schema public",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > packages/sdk/src/database.types.ts"
   },
   "devDependencies": {
-    "typescript": "^5.4.5",
+    "@supabase/supabase-js": "^2.43.4",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^17.4.2",
+    "supabase": "^2.98.2",
     "tsx": "^4.10.5",
-    "vitest": "^1.6.0"
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0",
+    "ws": "^8.20.1"
   }
 }
