@@ -44,4 +44,4 @@ Active development. Following a 10-phase build plan from scaffolding through bil
 
 ## License
 
-[MIT](LICENSE)
+Proprietary — Copyright (c) 2026 Will Ferens. All rights reserved.
