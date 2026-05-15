@@ -68,6 +68,16 @@ export function resolveDecision(
   return 'no_signal'
 }
 
+export function computeProbVariantWins(control: ArmState, variant: ArmState): number {
+  const cp = armToParams(control)
+  const vp = armToParams(variant)
+  let wins = 0
+  for (let i = 0; i < MONTE_CARLO_N; i++) {
+    if (sampleBeta(vp.alpha, vp.beta) > sampleBeta(cp.alpha, cp.beta)) wins++
+  }
+  return wins / MONTE_CARLO_N
+}
+
 export function computeFullStats(
   control: ArmState,
   variant: ArmState,

@@ -5,6 +5,10 @@ import { UnauthorizedError } from '../lib/errors.js'
 interface CacheEntry { userId: string; expiresAt: number }
 const cache = new Map<string, CacheEntry>()
 
+export function clearApiKeyCache(key: string): void {
+  cache.delete(key)
+}
+
 export const apiKeyAuth: MiddlewareHandler = async (c, next) => {
   const key = c.req.header('Authorization')?.replace('Bearer ', '').trim()
   if (!key) throw new UnauthorizedError()
