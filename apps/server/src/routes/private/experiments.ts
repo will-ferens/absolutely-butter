@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase.js'
 import { generateExperimentId } from '../../lib/id.js'
 import { NotFoundError, ApiError } from '../../lib/errors.js'
 import { computeFullStats, computeProbVariantWins } from '../../services/stats.js'
+import { billingGuard } from '../../middleware/billing-guard.js'
 
 type Variables = { userId: string }
 
@@ -67,7 +68,7 @@ experiments.get('/', async c => {
 })
 
 // POST /v1/experiments
-experiments.post('/', async c => {
+experiments.post('/', billingGuard, async c => {
   const userId = c.get('userId')
   const body = await c.req.json<{
     name: string
@@ -184,7 +185,7 @@ experiments.patch('/:id', async c => {
 })
 
 // POST /v1/experiments/:id/launch
-experiments.post('/:id/launch', async c => {
+experiments.post('/:id/launch', billingGuard, async c => {
   const userId = c.get('userId')
   const exp = await requireExperiment(c.req.param('id'), userId, 'draft')
 
@@ -240,7 +241,7 @@ experiments.post('/:id/conclude', async c => {
 })
 
 // POST /v1/experiments/:id/reactivate
-experiments.post('/:id/reactivate', async c => {
+experiments.post('/:id/reactivate', billingGuard, async c => {
   const userId = c.get('userId')
   const exp = await requireExperiment(c.req.param('id'), userId, 'inactive')
 

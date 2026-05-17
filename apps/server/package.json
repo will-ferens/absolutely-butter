@@ -15,7 +15,7 @@
     "@supabase/supabase-js": "^2.43.4",
     "dotenv": "^17.4.2",
     "hono": "^4.3.11",
-    "stripe": "^15.11.0",
+    "stripe": "^15.12.0",
     "ws": "^8.20.1"
   },
   "devDependencies": {
