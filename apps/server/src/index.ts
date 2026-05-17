@@ -10,6 +10,7 @@ import authRoute from './routes/private/auth.js'
 import experimentsRoute from './routes/private/experiments.js'
 import statsRoute from './routes/private/stats.js'
 import accountRoute from './routes/private/account.js'
+import billingRoute, { webhookHandler } from './routes/private/billing.js'
 
 type Variables = { userId: string }
 
@@ -36,6 +37,9 @@ publicApp.route('/events', eventsRoute)
 // Auth routes — signup/login bypass session middleware
 app.route('/v1/auth', authRoute)
 
+// Webhook is public — must bypass sessionAuth
+app.post('/v1/billing/webhook', webhookHandler)
+
 // ─── Private sub-app (dashboard-facing) ──────────────────────────────────────
 const privateApp = new Hono<{ Variables: Variables }>()
 privateApp.use('*', privateCors)
@@ -43,6 +47,7 @@ privateApp.use('*', sessionAuth)
 privateApp.route('/experiments', experimentsRoute)
 privateApp.route('/experiments', statsRoute)
 privateApp.route('/account', accountRoute)
+privateApp.route('/billing', billingRoute)
 
 app.route('/v1', publicApp)
 app.route('/v1', privateApp)
