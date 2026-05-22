@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ResendVerification from '@/components/ResendVerification'
 import NavLink from '@/components/NavLink'
+import TrialBanner from '@/components/TrialBanner'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -14,6 +15,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const headersList = headers()
   const subscriptionStatus = headersList.get('x-subscription-status') ?? 'trialing'
   const isActive = headersList.get('x-subscription-active') === 'true'
+  const trialEndsAt = headersList.get('x-trial-ends-at') ?? ''
+
+  const trialDaysRemaining = subscriptionStatus === 'trialing' && trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86_400_000))
+    : 0
 
   const isVerified = !!user.email_confirmed_at
   const daysSinceSignup = user.created_at
@@ -52,12 +58,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
       )}
 
-      {/* Subscription banner placeholder — Phase 14 */}
-      {!isActive && subscriptionStatus === 'canceled' && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-sm text-red-800 text-center">
-          Your subscription has ended. Upgrade to keep creating and launching experiments.
-        </div>
-      )}
+      {/* Subscription banner */}
+      <TrialBanner status={subscriptionStatus} trialDaysRemaining={trialDaysRemaining} />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
         {children}
