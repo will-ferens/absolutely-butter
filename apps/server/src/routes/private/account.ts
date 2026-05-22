@@ -18,6 +18,20 @@ function generateApiKey(): string {
     .replace(/=+$/, '')
 }
 
+account.get('/api-key', async c => {
+  const userId = c.get('userId')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('api_key')
+    .eq('id', userId)
+    .single()
+
+  if (!profile) return c.json({ error: 'Not found' }, 404)
+
+  return c.json({ apiKey: profile.api_key })
+})
+
 account.get('/', async c => {
   const userId = c.get('userId')
 
