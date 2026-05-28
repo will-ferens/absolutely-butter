@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "pnpm --filter @ab/server build"
+
+[deploy]
+startCommand = "node apps/server/dist/index.js"
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"

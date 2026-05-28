@@ -38,7 +38,7 @@ auth.post('/login', rateLimitByIp(10), async c => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        apikey: process.env.SUPABASE_SECRET_KEY!,
       },
       body: JSON.stringify({ email, password }),
     },
