@@ -1,6 +1,0 @@
-{
-  "buildCommand": "pnpm --filter @ab/dashboard build",
-  "outputDirectory": "apps/dashboard/.next",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": "nextjs"
-}
