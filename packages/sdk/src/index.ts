@@ -67,14 +67,17 @@ interface ConfigResponse {
 
 // ─── Impression event (fire-and-forget) ───────────────────────────────────────
 
-function fireImpression(): void {
+function sendEvent(event: 'impression' | 'conversion'): void {
   void fetch(`${_baseUrl}/v1/events`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${_apiKey}`,
+    },
     body: JSON.stringify({
       experimentId: _experimentId,
       variant: _variant,
-      event: 'impression',
+      event,
       timestamp: Date.now(),
       sessionId: _sessionId,
     }),
@@ -125,7 +128,7 @@ export async function init(config: {
     setCookie(`__ab_${_experimentId}`, _variant, 30)
     setCookie(`__ab_${_experimentId}_sid`, _sessionId, 30)
 
-    fireImpression()
+    sendEvent('impression')
   } catch {
     // network error, timeout, parse failure — fall back to control
   }
@@ -142,15 +145,5 @@ export function getVariant(): 'control' | 'variant' {
 
 export function track(event: 'conversion'): void {
   if (!_sessionId) return
-  void fetch(`${_baseUrl}/v1/events`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      experimentId: _experimentId,
-      variant: _variant,
-      event,
-      timestamp: Date.now(),
-      sessionId: _sessionId,
-    }),
-  }).catch(() => undefined)
+  sendEvent(event)
 }
