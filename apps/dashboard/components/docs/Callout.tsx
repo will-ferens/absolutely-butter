@@ -1,7 +1,7 @@
 type Tone = 'info' | 'warning' | 'success'
 
 const STYLES: Record<Tone, { box: string; label: string }> = {
-  info: { box: 'border-indigo-200 bg-indigo-50 text-indigo-900', label: 'text-indigo-600' },
+  info: { box: 'border-slate-200 bg-slate-100 text-slate-800', label: 'text-slate-700' },
   warning: { box: 'border-amber-200 bg-amber-50 text-amber-900', label: 'text-amber-700' },
   success: { box: 'border-green-200 bg-green-50 text-green-900', label: 'text-green-700' },
 }

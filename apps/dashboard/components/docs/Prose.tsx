@@ -16,7 +16,7 @@ export default function Prose({ children }: { children: React.ReactNode }) {
         [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-5
         [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-5
         [&_li]:my-1.5 [&_li>ul]:my-1.5
-        [&_a]:font-medium [&_a]:text-indigo-600 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-indigo-700
+        [&_a]:font-medium [&_a]:text-butter-700 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-butter-800
         [&_strong]:font-semibold [&_strong]:text-gray-900
         [&_hr]:my-12 [&_hr]:border-gray-200
         [&_p_code]:rounded [&_p_code]:bg-gray-100 [&_p_code]:px-1.5 [&_p_code]:py-0.5 [&_p_code]:font-mono [&_p_code]:text-[13px] [&_p_code]:text-gray-800

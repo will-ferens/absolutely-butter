@@ -1,20 +1,10 @@
 /**
- * Single source of truth for the docs site.
+ * Docs site navigation model.
  *
- * SDK_PACKAGE_NAME is a placeholder until the npm package is published — it is
- * referenced by every code sample and by the in-product integration snippet
- * (apps/server/src/routes/private/experiments.ts). Update it in one place here
- * once the real package name is known.
+ * SDK_PACKAGE_NAME / API_BASE_URL moved to `@/lib/site` (the landing page needs
+ * them too) and are re-exported here so existing docs imports keep working.
  */
-export const SDK_PACKAGE_NAME = '@absolutely-butter/sdk'
-
-/**
- * The public origin of the API the SDK talks to. Baked in at build time from
- * NEXT_PUBLIC_API_URL (set per-environment on Vercel); the fallback is only hit
- * in local dev where the API runs on :3001.
- */
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+export { SDK_PACKAGE_NAME, API_BASE_URL } from '@/lib/site'
 
 export type DocPage = {
   slug: string

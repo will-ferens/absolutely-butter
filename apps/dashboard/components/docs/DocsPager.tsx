@@ -12,7 +12,7 @@ export default function DocsPager({ slug }: { slug: string }) {
           className="group flex-1 rounded-lg border border-gray-200 px-4 py-3 transition-colors hover:border-gray-300"
         >
           <span className="text-xs text-gray-400">← Previous</span>
-          <span className="mt-0.5 block text-sm font-medium text-gray-900 group-hover:text-indigo-600">
+          <span className="mt-0.5 block text-sm font-medium text-gray-900 group-hover:text-butter-700">
             {prev.title}
           </span>
         </Link>
@@ -25,7 +25,7 @@ export default function DocsPager({ slug }: { slug: string }) {
           className="group flex-1 rounded-lg border border-gray-200 px-4 py-3 text-right transition-colors hover:border-gray-300"
         >
           <span className="text-xs text-gray-400">Next →</span>
-          <span className="mt-0.5 block text-sm font-medium text-gray-900 group-hover:text-indigo-600">
+          <span className="mt-0.5 block text-sm font-medium text-gray-900 group-hover:text-butter-700">
             {next.title}
           </span>
         </Link>
