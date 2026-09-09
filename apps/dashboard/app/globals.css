@@ -1,1 +1,150 @@
 @import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Absolutely Butter design system
+   Tokens transcribed from the Claude Design handoff bundle
+   ("Absolutely Butter Design System-handoff"). Values live here as Tailwind v4
+   theme variables so the whole app picks them up through the utilities it
+   already uses:
+
+     - `gray-*`    → warm "griddle ink" ramp (replaces Tailwind's cool gray)
+     - `indigo-*`  → the near-black "action ink" ramp (primary buttons, focus)
+     - `amber/green/red/slate/blue-*` → the warmer design-system equivalents
+     - `butter-*`  → NEW namespace: brand fill, links, the variant data arm
+     - shadows     → warm brown-black
+     - fonts       → Bricolage Grotesque / Instrument Sans / JetBrains Mono
+                     (loaded in app/layout.tsx via next/font)
+
+   The CTA is deliberately ink, not butter — butter stays brand + data accent.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Fonts — the `*.variable` vars are set on <html> in app/layout.tsx */
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+  --font-display: var(--font-bricolage), var(--font-instrument), system-ui,
+    sans-serif;
+
+  --tracking-display: -0.03em;
+  --tracking-tight: -0.02em;
+
+  /* Griddle ink — warm neutrals. Mapped 1:1 onto Tailwind's gray stops so
+     every existing `*-gray-*` utility becomes brown-shifted. */
+  --color-gray-50: #f8f5f0;
+  --color-gray-100: #efeae2;
+  --color-gray-200: #e2dbd1;
+  --color-gray-300: #b8aea3;
+  --color-gray-400: #8c8177;
+  --color-gray-500: #6b6157;
+  --color-gray-600: #544a42;
+  --color-gray-700: #3d3630;
+  --color-gray-800: #2b2521;
+  --color-gray-900: #1c1815;
+  --color-gray-950: #12100e;
+
+  /* Action ink — the primary-button / focus ramp. Existing code uses
+     `bg-indigo-600 hover:bg-indigo-700`; 600 is action-bg (ink-900) and 700 is
+     action-bg-hover (ink-800, intentionally *lighter*). */
+  --color-indigo-50: #f8f5f0;
+  --color-indigo-100: #efeae2;
+  --color-indigo-200: #e2dbd1;
+  --color-indigo-300: #b8aea3;
+  --color-indigo-400: #6b6157;
+  --color-indigo-500: #3d3630;
+  --color-indigo-600: #1c1815;
+  --color-indigo-700: #2b2521;
+  --color-indigo-800: #12100e;
+  --color-indigo-900: #12100e;
+  --color-indigo-950: #0c0a09;
+
+  /* Butter — primary brand ramp. NEW utilities (`bg-butter-500`, `text-butter-700`…).
+     Brand fill, links, signal dot, and the variant data-viz arm. NOT the CTA. */
+  --color-butter-50: #fffbf0;
+  --color-butter-100: #fef3d7;
+  --color-butter-200: #fbe3a6;
+  --color-butter-300: #f6ce6b;
+  --color-butter-400: #efb43a;
+  --color-butter-500: #e19a18;
+  --color-butter-600: #be7a0c;
+  --color-butter-700: #955d0a;
+  --color-butter-800: #6f4509;
+  --color-butter-900: #4a2e07;
+
+  /* Warm-shifted feedback + status colours (design-system values). */
+  --color-amber-50: #fdeadd;
+  --color-amber-100: #fdeadd;
+  --color-amber-200: #f6cdb0;
+  --color-amber-500: #d1701f;
+  --color-amber-700: #a1500f;
+  --color-amber-800: #8f4413;
+  --color-amber-900: #6f4509;
+
+  --color-green-50: #e3f0e7;
+  --color-green-100: #e3f0e7;
+  --color-green-200: #c2ddca;
+  --color-green-300: #9cc7a9;
+  --color-green-400: #63a97d;
+  --color-green-500: #3f8f5b;
+  --color-green-600: #2f7d52;
+  --color-green-700: #1e5c39;
+  --color-green-800: #17492e;
+  --color-green-900: #123a25;
+
+  --color-red-50: #fbe9e4;
+  --color-red-100: #fbe9e4;
+  --color-red-200: #f3cec4;
+  --color-red-300: #e6a996;
+  --color-red-400: #d4735a;
+  --color-red-500: #c3462f;
+  --color-red-600: #b23a22;
+  --color-red-700: #8c2c19;
+  --color-red-800: #732317;
+  --color-red-900: #5f1e15;
+
+  --color-slate-50: #e9eef6;
+  --color-slate-100: #e9eef6;
+  --color-slate-200: #cfdbea;
+  --color-slate-300: #a9bfdb;
+  --color-slate-400: #7592bf;
+  --color-slate-500: #55749c;
+  --color-slate-600: #45658f;
+  --color-slate-700: #2f4a70;
+  --color-slate-800: #263b59;
+  --color-slate-900: #1f2f47;
+
+  /* `blue-*` is used in a couple of docs callouts — fold it onto slate. */
+  --color-blue-50: #e9eef6;
+  --color-blue-100: #e9eef6;
+  --color-blue-200: #cfdbea;
+  --color-blue-700: #2f4a70;
+  --color-blue-800: #263b59;
+
+  /* Warm brown-black elevation. Cards rest flat; only hover / menus / modals lift. */
+  --shadow-xs: 0 1px 2px 0 rgb(28 24 21 / 0.06);
+  --shadow-sm: 0 1px 2px 0 rgb(28 24 21 / 0.06);
+  --shadow-md: 0 1px 3px 0 rgb(28 24 21 / 0.08), 0 1px 2px -1px rgb(28 24 21 / 0.08);
+  --shadow-lg: 0 10px 15px -3px rgb(28 24 21 / 0.08), 0 4px 6px -4px rgb(28 24 21 / 0.06);
+  --shadow-xl: 0 20px 25px -5px rgb(28 24 21 / 0.12), 0 8px 10px -6px rgb(28 24 21 / 0.08);
+}
+
+/* Semantic aliases for hand-written component CSS (the marketing prose block,
+   the SDK code panel). Kept out of @theme because they don't need utilities. */
+:root {
+  --ab-surface-page: #f8f5f0;
+  --ab-surface-card: #ffffff;
+  --ab-surface-inverse: #2a1e10;
+  --ab-border: #e2dbd1;
+  --ab-border-strong: #b8aea3;
+  --ab-text-strong: #1c1815;
+  --ab-text-body: #3d3630;
+  --ab-text-muted: #6b6157;
+  --ab-text-faint: #8c8177;
+  --ab-link: #955d0a;
+  --ab-link-hover: #6f4509;
+}
+
+body {
+  font-family: var(--font-sans);
+}

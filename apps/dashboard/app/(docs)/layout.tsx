@@ -14,11 +14,16 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <Link href="/docs" className="text-sm font-semibold text-gray-900">
+            <Link
+              href="/"
+              className="font-display text-sm font-semibold tracking-[-0.01em] text-gray-900 transition-colors hover:text-gray-600"
+            >
               Absolutely Butter
             </Link>
             <span className="text-sm text-gray-300">/</span>
-            <span className="text-sm text-gray-500">Docs</span>
+            <Link href="/docs" className="text-sm text-gray-500 transition-colors hover:text-gray-900">
+              Docs
+            </Link>
           </div>
           <nav className="flex items-center gap-5 text-sm">
             <Link href="/experiments" className="text-gray-500 transition-colors hover:text-gray-900">
