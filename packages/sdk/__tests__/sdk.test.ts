@@ -140,6 +140,7 @@ describe('track()', () => {
     expect(fetchMock).toHaveBeenCalledOnce()
     const [url, opts] = fetchMock.mock.calls[0]
     expect(url).toBe(`${BASE_URL}/v1/events`)
+    expect((opts.headers as Record<string, string>).Authorization).toBe(`Bearer ${API_KEY}`)
     const body = JSON.parse(opts.body as string)
     expect(body.event).toBe('conversion')
     expect(body.experimentId).toBe(EXPERIMENT_ID)

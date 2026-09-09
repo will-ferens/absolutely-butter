@@ -7,9 +7,20 @@ const PUBLIC_PATHS = [
   '/forgot-password',
   '/reset-password',
   '/auth/callback',
+  '/docs',
 ]
 
+// Fully public surfaces that need no session refresh and must render even if
+// Supabase auth is misconfigured or unreachable.
+const AUTH_FREE_PREFIXES = ['/docs']
+
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  if (AUTH_FREE_PREFIXES.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
+    return NextResponse.next({ request: { headers: request.headers } })
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   })
@@ -36,7 +47,6 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const pathname = request.nextUrl.pathname
   const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p))
 
   if (!user && !isPublic) {

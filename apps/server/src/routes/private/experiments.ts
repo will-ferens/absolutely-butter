@@ -9,6 +9,23 @@ type Variables = { userId: string }
 
 const experiments = new Hono<{ Variables: Variables }>()
 
+// Placeholder until the SDK npm package is published — keep in sync with the
+// docs (apps/dashboard/lib/docs/nav.ts SDK_PACKAGE_NAME).
+const SDK_PACKAGE = process.env.PUBLIC_SDK_PACKAGE ?? '@absolutely-butter/sdk'
+const PUBLIC_API_URL = process.env.PUBLIC_API_URL ?? 'https://api.absolutely-butter.com'
+
+function buildSnippet(apiKey: string, experimentId: string): string {
+  return [
+    `import { init, getVariant, track } from '${SDK_PACKAGE}'`,
+    ``,
+    `init({`,
+    `  apiKey: '${apiKey}',`,
+    `  experimentId: '${experimentId}',`,
+    `  baseUrl: '${PUBLIC_API_URL}',`,
+    `})`,
+  ].join('\n')
+}
+
 type ExperimentStatus = 'draft' | 'live' | 'inactive' | 'archived'
 
 async function requireExperiment(experimentId: string, userId: string, requiredStatus?: ExperimentStatus) {
@@ -116,7 +133,7 @@ experiments.post('/', billingGuard, async c => {
     .single()
 
   const apiKey = profile?.api_key ?? 'YOUR_API_KEY'
-  const snippet = `AbsolutelyButter.init({ apiKey: '${apiKey}', experimentId: '${experimentId}' })`
+  const snippet = buildSnippet(apiKey, experimentId)
 
   return c.json({ experiment: exp, snippet }, 201)
 })

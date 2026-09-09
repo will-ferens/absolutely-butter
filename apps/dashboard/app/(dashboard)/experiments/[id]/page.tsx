@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { serverFetch } from '@/lib/server-api'
 import type { ExperimentDetail } from '@/lib/experiments'
+import { SDK_PACKAGE_NAME, API_BASE_URL } from '@/lib/docs/nav'
 import ExperimentDetailClient from './ExperimentDetailClient'
 
 type PageProps = { params: { id: string } }
@@ -29,7 +30,15 @@ export default async function ExperimentDetailPage({ params }: PageProps) {
   const accountRes = await serverFetch('/v1/account')
   const account = accountRes.ok ? await accountRes.json() as { apiKey: string } : null
   const apiKey = account?.apiKey ?? 'YOUR_API_KEY'
-  const snippet = `AbsolutelyButter.init({ apiKey: '${apiKey}', experimentId: '${experiment.id}' })`
+  const snippet = [
+    `import { init, getVariant, track } from '${SDK_PACKAGE_NAME}'`,
+    ``,
+    `init({`,
+    `  apiKey: '${apiKey}',`,
+    `  experimentId: '${experiment.id}',`,
+    `  baseUrl: '${API_BASE_URL}',`,
+    `})`,
+  ].join('\n')
 
   return (
     <div className="max-w-2xl">
