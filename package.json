@@ -4,7 +4,7 @@
   "scripts": {
     "dev:server": "pnpm --filter @ab/server dev",
     "dev:dashboard": "pnpm --filter @ab/dashboard dev",
-    "typecheck": "pnpm -r tsc --noEmit",
+    "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r test",
     "test:db": "vitest run supabase/tests --reporter=verbose",
     "db:push": "supabase db push",
