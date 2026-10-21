@@ -145,8 +145,10 @@ export default function ExperimentLifecyclePage() {
           <p>
             The SDK&apos;s config endpoint reports the experiment as not live, so{' '}
             <code>getVariant()</code> returns <code>control</code> for everyone and
-            any impression or conversion events are dropped. Remove or update the
-            experiment id in your integration once you&apos;ve concluded.
+            any impression or conversion events are dropped. The event endpoint
+            also rechecks the live state inside the atomic write, so an event
+            that races with conclusion cannot add a late count. Remove or update
+            the experiment id in your integration once you&apos;ve concluded.
           </p>
         </Callout>
 

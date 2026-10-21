@@ -254,3 +254,150 @@ describe('increment_impressions and increment_conversions', () => {
     expect(data!.conversions).toBe(1)
   })
 })
+
+describe('atomic event processing', () => {
+  let userId: string
+  let experimentId: string
+  const controlSessionId = '00000000-0000-4000-8000-000000000001'
+  const variantSessionId = '00000000-0000-4000-8000-000000000002'
+
+  beforeEach(async () => {
+    const { data } = await supabase.auth.admin.createUser({
+      email: `event-test-${Date.now()}@test.com`,
+      password: 'testpassword123',
+      email_confirm: true,
+    })
+    userId = data.user!.id
+    experimentId = `exp_event_${Date.now()}`
+
+    await supabase.from('experiments').insert({
+      id: experimentId,
+      user_id: userId,
+      name: 'Atomic event test',
+      control_description: 'Control arm',
+      variant_description: 'Variant arm',
+      goal: 'Test conversions',
+      status: 'live',
+    })
+
+    await supabase.from('experiment_arms').insert([
+      { experiment_id: experimentId, arm: 'control' },
+      { experiment_id: experimentId, arm: 'variant' },
+    ])
+  })
+
+  afterEach(async () => {
+    await supabase.from('experiments').delete().eq('id', experimentId)
+    await supabase.auth.admin.deleteUser(userId)
+  })
+
+  it('counts an impression once and reports duplicate arm mismatches', async () => {
+    const first = await supabase.rpc('record_impression', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_arm: 'control',
+    })
+    expect(first.error).toBeNull()
+    expect(first.data?.[0]).toMatchObject({ outcome: 'counted', stored_arm: 'control', mismatch: false })
+
+    const duplicate = await supabase.rpc('record_impression', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_arm: 'variant',
+    })
+    expect(duplicate.error).toBeNull()
+    expect(duplicate.data?.[0]).toMatchObject({ outcome: 'mismatch', stored_arm: 'control', mismatch: true })
+
+    const { data: arm } = await supabase
+      .from('experiment_arms')
+      .select('impressions')
+      .eq('experiment_id', experimentId)
+      .eq('arm', 'control')
+      .single()
+    expect(arm!.impressions).toBe(1)
+  })
+
+  it('uses the stored arm and rejects mismatched conversions', async () => {
+    await supabase.rpc('record_impression', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_arm: 'control',
+    })
+
+    const mismatch = await supabase.rpc('record_conversion', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_submitted_arm: 'variant',
+    })
+    expect(mismatch.data?.[0]).toMatchObject({ outcome: 'mismatch', stored_arm: 'control', mismatch: true })
+
+    const valid = await supabase.rpc('record_conversion', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_submitted_arm: 'control',
+    })
+    expect(valid.data?.[0]).toMatchObject({ outcome: 'counted', stored_arm: 'control', mismatch: false })
+
+    const duplicate = await supabase.rpc('record_conversion', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_submitted_arm: 'control',
+    })
+    expect(duplicate.data?.[0]).toMatchObject({ outcome: 'duplicate', stored_arm: 'control', mismatch: false })
+
+    const { data: arms } = await supabase
+      .from('experiment_arms')
+      .select('arm, conversions')
+      .eq('experiment_id', experimentId)
+    expect(arms!.find(a => a.arm === 'control')!.conversions).toBe(1)
+    expect(arms!.find(a => a.arm === 'variant')!.conversions).toBe(0)
+  })
+
+  it('does not convert unknown sessions and rejects writes after conclusion', async () => {
+    const unknown = await supabase.rpc('record_conversion', {
+      p_experiment_id: experimentId,
+      p_session_id: variantSessionId,
+      p_submitted_arm: 'variant',
+    })
+    expect(unknown.data?.[0]).toMatchObject({ outcome: 'unknown_session', stored_arm: null, mismatch: false })
+
+    await supabase
+      .from('experiments')
+      .update({ status: 'inactive' })
+      .eq('id', experimentId)
+
+    const impression = await supabase.rpc('record_impression', {
+      p_experiment_id: experimentId,
+      p_session_id: variantSessionId,
+      p_arm: 'variant',
+    })
+    expect(impression.data?.[0]).toMatchObject({ outcome: 'inactive', stored_arm: null, mismatch: false })
+  })
+
+  it('serializes concurrent conversions to one count', async () => {
+    await supabase.rpc('record_impression', {
+      p_experiment_id: experimentId,
+      p_session_id: controlSessionId,
+      p_arm: 'control',
+    })
+
+    const results = await Promise.all(Array.from({ length: 8 }, () =>
+      supabase.rpc('record_conversion', {
+        p_experiment_id: experimentId,
+        p_session_id: controlSessionId,
+        p_submitted_arm: 'control',
+      }),
+    ))
+
+    expect(results.filter(result => result.data?.[0]?.outcome === 'counted')).toHaveLength(1)
+    expect(results.filter(result => result.data?.[0]?.outcome === 'duplicate')).toHaveLength(7)
+
+    const { data: arm } = await supabase
+      .from('experiment_arms')
+      .select('conversions')
+      .eq('experiment_id', experimentId)
+      .eq('arm', 'control')
+      .single()
+    expect(arm!.conversions).toBe(1)
+  })
+})

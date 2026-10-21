@@ -152,6 +152,14 @@ export default function SdkReferencePage() {
           accepted argument.
         </p>
         <p>
+          The server keeps the assignment captured by the impression as the
+          authoritative arm. A repeated conversion, a conversion without a
+          matching impression, an event for an experiment that is no longer{' '}
+          <code>live</code>, or a payload whose arm disagrees with the stored
+          assignment is ignored. These cases still receive the same non-blocking{' '}
+          <code>202</code> response and do not change experiment totals.
+        </p>
+        <p>
           It does nothing if there is no session id — which happens when{' '}
           <code>init()</code> never established a live session, or when a returning
           visitor&apos;s <code>_sid</code> cookie was cleared. The server also
@@ -242,6 +250,13 @@ export default function SdkReferencePage() {
             <code>202</code>; the SDK does not wait on it.
           </li>
         </ul>
+        <p>
+          Event processing is idempotent on the server. The first valid
+          impression creates the session and increments the stored arm; later
+          retries preserve that arm and do not increment again. Conversion
+          attribution uses the stored arm, and the server uses its receipt time
+          rather than the SDK timestamp for lifecycle decisions.
+        </p>
         <p>
           Full request and response shapes are in the{' '}
           <Link href="/docs/how-the-stats-work">statistics reference</Link> and the
