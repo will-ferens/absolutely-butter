@@ -9,8 +9,9 @@ type Variables = { userId: string }
 
 const experiments = new Hono<{ Variables: Variables }>()
 
-// Placeholder until the SDK npm package is published — keep in sync with the
-// docs (apps/dashboard/lib/docs/nav.ts SDK_PACKAGE_NAME).
+// Keep the generated snippet aligned with the canonical package name in the
+// dashboard docs. PUBLIC_SDK_PACKAGE remains available for environment-specific
+// previews and test deployments.
 const SDK_PACKAGE = process.env.PUBLIC_SDK_PACKAGE ?? '@absolutely-butter/sdk'
 const PUBLIC_API_URL = process.env.PUBLIC_API_URL ?? 'https://api.absolutely-butter.com'
 

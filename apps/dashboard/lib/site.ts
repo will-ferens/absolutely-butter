@@ -4,10 +4,8 @@
  */
 
 /**
- * SDK npm package name. Placeholder until the package is published — referenced
- * by every code sample (docs + landing) and by the snippet the server generates
- * (apps/server/src/routes/private/experiments.ts, env PUBLIC_SDK_PACKAGE).
- * Change it here once the real name is known.
+ * Canonical SDK npm package name, referenced by every code sample (docs +
+ * landing) and by the snippet the server generates.
  */
 export const SDK_PACKAGE_NAME = '@absolutely-butter/sdk'
 
@@ -24,7 +22,7 @@ export const API_BASE_URL =
  * Override with NEXT_PUBLIC_SITE_URL per environment.
  */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://absolutely-butter.com'
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.absolutely-butter.app'
 
 export const PRICE_PER_MONTH = 19
 export const TRIAL_DAYS = 30

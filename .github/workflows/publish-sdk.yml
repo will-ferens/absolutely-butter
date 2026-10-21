@@ -1,0 +1,60 @@
+name: Publish SDK
+
+on:
+  push:
+    tags:
+      - 'sdk-v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-sdk
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify tag matches package version
+        working-directory: packages/sdk
+        run: |
+          version=$(node -p "require('./package.json').version")
+          test "$GITHUB_REF_NAME" = "sdk-v$version"
+
+      - name: Build SDK
+        run: pnpm --filter @absolutely-butter/sdk build
+
+      - name: Typecheck SDK
+        run: pnpm --filter @absolutely-butter/sdk typecheck
+
+      - name: Test SDK
+        run: pnpm --filter @absolutely-butter/sdk test
+
+      - name: Verify packed SDK
+        run: pnpm --filter @absolutely-butter/sdk verify:package
+
+      - name: Publish to npm with trusted publishing
+        working-directory: packages/sdk
+        run: npm publish --access public

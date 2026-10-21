@@ -15,7 +15,7 @@ Absolutely Butter lets you run experiments on your product and tells you when yo
 | API | [Hono](https://hono.dev) on Node.js |
 | Database | [Supabase](https://supabase.com) (PostgreSQL + Auth) |
 | Dashboard | [Next.js](https://nextjs.org) App Router |
-| SDK | Zero-dependency TypeScript package |
+| SDK | Zero-dependency TypeScript package published as `@absolutely-butter/sdk` |
 | Billing | [Stripe](https://stripe.com) |
 | Deployment | Railway (API) + Vercel (dashboard) |
 

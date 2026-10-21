@@ -43,7 +43,7 @@ A/B testing SaaS for solo technical founders. Statistically honest results via T
 │           └── supabase/      # server.ts + client.ts helpers
 │
 ├── packages/
-│   └── sdk/             # @ab/sdk — npm package, zero dependencies
+│   └── sdk/             # @absolutely-butter/sdk — npm package, zero dependencies
 │       └── src/index.ts # init, ready, getVariant, track
 │
 ├── CLAUDE.md
@@ -58,11 +58,11 @@ A/B testing SaaS for solo technical founders. Statistically honest results via T
 |---|---|
 | `apps/server` | `@ab/server` |
 | `apps/dashboard` | `@ab/dashboard` |
-| `packages/sdk` | `@ab/sdk` |
+| `packages/sdk` | `@absolutely-butter/sdk` |
 
 ## Key Constraints
 
-**SDK (`@ab/sdk`):**
+**SDK (`@absolutely-butter/sdk`):**
 - Zero runtime dependencies — `dependencies` field must remain empty
 - Bundle must stay under 5kb gzipped (enforced as a check in Phase 4)
 - Four exports only: `init`, `ready`, `getVariant`, `track`
@@ -130,5 +130,5 @@ pnpm -r test
 
 # Run tests for a specific package
 pnpm --filter @ab/server test
-pnpm --filter @ab/sdk test
+pnpm --filter @absolutely-butter/sdk test
 ```

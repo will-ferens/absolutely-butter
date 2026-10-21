@@ -1,6 +1,29 @@
 {
-  "name": "@ab/sdk",
+  "name": "@absolutely-butter/sdk",
   "version": "0.1.0",
+  "description": "A zero-dependency browser SDK for Absolutely Butter experiments.",
+  "author": "Will Ferens",
+  "license": "UNLICENSED",
+  "keywords": [
+    "ab testing",
+    "experimentation",
+    "bayesian",
+    "thompson sampling",
+    "browser sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/will-ferens/absolutely-butter.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://www.absolutely-butter.app/docs/quickstart",
+  "bugs": {
+    "url": "https://github.com/will-ferens/absolutely-butter/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -18,7 +41,8 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:package": "node scripts/verify-package.mjs"
   },
   "devDependencies": {
     "happy-dom": "^20.9.0",
