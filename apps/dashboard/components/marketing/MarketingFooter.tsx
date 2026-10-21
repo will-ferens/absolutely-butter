@@ -9,10 +9,6 @@ const LINKS = [
   { href: '/terms', label: 'Terms of Service' },
 ]
 
-/**
- * Closing CTA band + footer. Lives in the marketing layout so every marketing
- * route (landing, /privacy, /terms) carries the same footer.
- */
 export default function MarketingFooter() {
   return (
     <footer className="border-t border-gray-200 bg-gray-50">
@@ -22,7 +18,7 @@ export default function MarketingFooter() {
         </h2>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-gray-600">
           {TRIAL_DAYS} days free, no card. Create an experiment, drop in the SDK,
-          and read an honest probability from your first few hundred visitors.
+          and make a confident decision from your first few hundred visitors.
         </p>
         <div className="mt-7">
           <TrialCta size="lg" />

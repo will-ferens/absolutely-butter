@@ -8,10 +8,6 @@ const INCLUDED = [
   'Automatic traffic allocation via Thompson sampling',
 ]
 
-/**
- * One tier. No comparison table, no annual toggle, no "contact sales". Matches
- * the real billing: a single $19/mo Stripe price, 30-day trial, no card up front.
- */
 export default function Pricing() {
   return (
     <section className="border-t border-gray-200 bg-white">

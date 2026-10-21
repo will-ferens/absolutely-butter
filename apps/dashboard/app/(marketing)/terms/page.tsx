@@ -14,9 +14,7 @@ export default function TermsPage() {
   return (
     <LegalPage title="Terms of Service" lastUpdated="September 2026">
       <p>
-        These placeholder terms cover the Absolutely Butter beta. A full
-        agreement will replace them before general availability. By creating an
-        account you accept the following.
+        By creating an account you accept the following.
       </p>
 
       <h2>The service</h2>
@@ -55,7 +53,7 @@ export default function TermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions: <a href="mailto:support@absolutely-butter.com">support@absolutely-butter.com</a>.
+        Questions: <a href="mailto:absolutely-butter@gmail.com">absolutely-butter@gmail.com</a>.
       </p>
     </LegalPage>
   )

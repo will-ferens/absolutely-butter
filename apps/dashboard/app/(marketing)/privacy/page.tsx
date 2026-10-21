@@ -56,7 +56,7 @@ export default function PrivacyPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about privacy: <a href="mailto:privacy@absolutely-butter.com">privacy@absolutely-butter.com</a>.
+        Questions about privacy: <a href="mailto:privacy@absolutely-butter.app">privacy@absolutely-butter.app</a>.
       </p>
     </LegalPage>
   )

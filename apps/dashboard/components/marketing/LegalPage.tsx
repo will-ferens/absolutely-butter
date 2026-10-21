@@ -1,10 +1,7 @@
 import Wordmark from './Wordmark'
 
 /**
- * Shared shell for /privacy and /terms. Placeholder-grade content is acceptable
- * at launch (per the ticket) — real legal text is a separate follow-up, and is
- * required before any paid launch (Stripe needs a terms URL; collecting email +
- * running Stripe means a privacy policy is expected).
+ * Shared shell for /privacy and /terms.
  */
 export default function LegalPage({
   title,

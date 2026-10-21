@@ -11,13 +11,12 @@ export default function Hero() {
       <Wordmark />
 
       <h1 className="mt-16 max-w-3xl font-display text-4xl font-bold leading-[1.08] tracking-[-0.03em] text-gray-900 sm:mt-20 sm:text-[56px]">
-        Know which version is winning before you have the traffic to prove it.
+         A/B testing for products without enterprise traffic.
       </h1>
 
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-gray-600">
-        A/B testing tools built for enterprise scale need thousands of conversions
-        before they&rsquo;ll say anything. Absolutely Butter gives you an honest
-        probability from the traffic you actually have.
+        Absolutely Butter tells you how likely each version is to win, so you can
+        make confident product decisions with the traffic you have today.
       </p>
 
       <div className="mt-9">
