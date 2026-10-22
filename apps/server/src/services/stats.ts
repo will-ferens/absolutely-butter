@@ -1,4 +1,4 @@
-import { sampleBeta } from './bandit.js'
+import { sampleBeta, type RandomSource } from './bandit.js'
 
 export interface ArmState {
   impressions: number
@@ -26,14 +26,28 @@ export interface FullStats {
   probVariantWins: number
   expectedLoss: ExpectedLoss
   relativeLift: number
+  totalImpressions: number
+  observedConversionRates: {
+    control: number
+    variant: number
+  }
   credibleIntervals: {
     control: [number, number]
     variant: [number, number]
   }
+  credibleIntervalWidths: {
+    control: number
+    variant: number
+  }
+  warningCodes: Array<'early_data'>
+  minimumPracticalLift: number
   decision: Decision
 }
 
 const MONTE_CARLO_N = 10_000
+export const MINIMUM_PRACTICAL_LIFT = 0.01
+export const EARLY_DATA_TOTAL_IMPRESSIONS = 100
+export const EARLY_DATA_MIN_ARM_IMPRESSIONS = 30
 
 function armToParams(arm: ArmState): BetaParams {
   return {
@@ -45,9 +59,10 @@ function armToParams(arm: ArmState): BetaParams {
 export function betaCredibleInterval(
   params: BetaParams,
   credibility: number,
+  random: RandomSource = Math.random,
 ): [number, number] {
   const samples: number[] = Array.from({ length: MONTE_CARLO_N }, () =>
-    sampleBeta(params.alpha, params.beta),
+    sampleBeta(params.alpha, params.beta, random),
   )
   samples.sort((a, b) => a - b)
   const tail = (1 - credibility) / 2
@@ -68,12 +83,16 @@ export function resolveDecision(
   return 'no_signal'
 }
 
-export function computeProbVariantWins(control: ArmState, variant: ArmState): number {
+export function computeProbVariantWins(
+  control: ArmState,
+  variant: ArmState,
+  random: RandomSource = Math.random,
+): number {
   const cp = armToParams(control)
   const vp = armToParams(variant)
   let wins = 0
   for (let i = 0; i < MONTE_CARLO_N; i++) {
-    if (sampleBeta(vp.alpha, vp.beta) > sampleBeta(cp.alpha, cp.beta)) wins++
+    if (sampleBeta(vp.alpha, vp.beta, random) > sampleBeta(cp.alpha, cp.beta, random)) wins++
   }
   return wins / MONTE_CARLO_N
 }
@@ -81,6 +100,7 @@ export function computeProbVariantWins(control: ArmState, variant: ArmState): nu
 export function computeFullStats(
   control: ArmState,
   variant: ArmState,
+  random: RandomSource = Math.random,
 ): FullStats {
   const cp = armToParams(control)
   const vp = armToParams(variant)
@@ -90,8 +110,8 @@ export function computeFullStats(
   let lossIfChooseControl = 0
 
   for (let i = 0; i < MONTE_CARLO_N; i++) {
-    const cs = sampleBeta(cp.alpha, cp.beta)
-    const vs = sampleBeta(vp.alpha, vp.beta)
+    const cs = sampleBeta(cp.alpha, cp.beta, random)
+    const vs = sampleBeta(vp.alpha, vp.beta, random)
     if (vs > cs) wins++
     lossIfChooseVariant += Math.max(0, cs - vs)
     lossIfChooseControl += Math.max(0, vs - cs)
@@ -108,14 +128,32 @@ export function computeFullStats(
   const relativeLift =
     rateControl === 0 ? 0 : (rateVariant - rateControl) / rateControl
 
+  const credibleIntervals = {
+    control: betaCredibleInterval(cp, 0.95, random),
+    variant: betaCredibleInterval(vp, 0.95, random),
+  }
+  const totalImpressions = control.impressions + variant.impressions
+
   return {
     probVariantWins,
     expectedLoss,
     relativeLift,
-    credibleIntervals: {
-      control: betaCredibleInterval(cp, 0.95),
-      variant: betaCredibleInterval(vp, 0.95),
+    totalImpressions,
+    observedConversionRates: {
+      control: control.impressions === 0 ? 0 : control.conversions / control.impressions,
+      variant: variant.impressions === 0 ? 0 : variant.conversions / variant.impressions,
     },
+    credibleIntervals,
+    credibleIntervalWidths: {
+      control: credibleIntervals.control[1] - credibleIntervals.control[0],
+      variant: credibleIntervals.variant[1] - credibleIntervals.variant[0],
+    },
+    warningCodes: totalImpressions < EARLY_DATA_TOTAL_IMPRESSIONS ||
+      control.impressions < EARLY_DATA_MIN_ARM_IMPRESSIONS ||
+      variant.impressions < EARLY_DATA_MIN_ARM_IMPRESSIONS
+      ? ['early_data']
+      : [],
+    minimumPracticalLift: MINIMUM_PRACTICAL_LIFT,
     decision: resolveDecision(
       probVariantWins,
       expectedLoss.ifChooseVariant,

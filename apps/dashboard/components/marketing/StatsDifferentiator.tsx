@@ -20,7 +20,7 @@ const BEATS = [
   {
     n: '03',
     title: '“78% probability variant is better” means exactly that',
-    body: 'Of all the true conversion rates still consistent with your data, the variant beats the control in 78% of them. It is a direct statement about your experiment — not a p-value, not a significance threshold you either cleared or didn’t.',
+    body: 'Of all the true conversion rates still consistent with your data, the variant beats the control in 78% of them. It is a direct posterior probability about your experiment — not a p-value or a conventional significance threshold.',
   },
   {
     n: '04',

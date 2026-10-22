@@ -1,4 +1,4 @@
-import { estimateDaysToSignificance } from '@/lib/experiments'
+import { estimateDaysToResult } from '@/lib/experiments'
 import type { ExperimentArm, FullStats } from '@/lib/experiments'
 
 type Props = {
@@ -16,29 +16,30 @@ export default function ForwardProjection({ launchedAt, control, variant, stats 
   const totalConversions = control.conversions + variant.conversions
   const baselineRate = totalImpressions > 0 ? totalConversions / totalImpressions : 0
 
-  const daysToSignificance = estimateDaysToSignificance(launchedAt, totalImpressions, baselineRate)
+  const daysToResult = estimateDaysToResult(launchedAt, totalImpressions, baselineRate)
 
   const launchDate = new Date(launchedAt)
-  const estimatedDate = daysToSignificance !== null && daysToSignificance > 0
-    ? new Date(launchDate.getTime() + daysToSignificance * 86_400_000)
+  const estimatedDate = daysToResult !== null && daysToResult > 0
+    ? new Date(launchDate.getTime() + daysToResult * 86_400_000)
     : null
 
   const daysElapsed = (Date.now() - launchDate.getTime()) / 86_400_000
-  const progressPct = daysToSignificance && daysToSignificance > 0
-    ? Math.min(100, Math.round((daysElapsed / daysToSignificance) * 100))
+  const progressPct = daysToResult && daysToResult > 0
+    ? Math.min(100, Math.round((daysElapsed / daysToResult) * 100))
     : 0
 
   return (
     <div className="border border-gray-200 rounded-lg px-4 py-4">
-      <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-3">Forward Projection</p>
+      <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">Planning estimate</p>
+      <p className="text-xs text-gray-400 mb-3">A rough projection from current traffic and observed conversion rates.</p>
 
-      {daysToSignificance === null ? (
+      {daysToResult === null ? (
         <p className="text-sm text-amber-700 bg-amber-50 rounded-md px-3 py-2">
-          At your current traffic level, this experiment may not reach 95% confidence within 90 days.
+          At your current traffic level, this experiment may not produce a clear result within 90 days.
         </p>
-      ) : daysToSignificance === 0 ? (
+      ) : daysToResult === 0 ? (
         <p className="text-sm text-green-700">
-          You have enough data to reach a conclusion — consider wrapping up this experiment.
+          This estimate says you have enough data to consider wrapping up the experiment.
         </p>
       ) : (
         <div className="space-y-3">
@@ -53,7 +54,7 @@ export default function ForwardProjection({ launchedAt, control, variant, stats 
             />
           </div>
           <p className="text-xs text-gray-500">
-            ~{daysToSignificance - Math.floor(daysElapsed)} days remaining at current traffic
+            ~{daysToResult - Math.floor(daysElapsed)} days remaining at current traffic
           </p>
         </div>
       )}

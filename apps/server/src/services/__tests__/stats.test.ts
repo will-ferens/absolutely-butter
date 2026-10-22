@@ -3,7 +3,18 @@ import {
   computeFullStats,
   resolveDecision,
   betaCredibleInterval,
+  EARLY_DATA_MIN_ARM_IMPRESSIONS,
+  EARLY_DATA_TOTAL_IMPRESSIONS,
+  MINIMUM_PRACTICAL_LIFT,
 } from '../stats.js'
+
+function seededRandom(seed: number): () => number {
+  let state = seed >>> 0
+  return () => {
+    state = (1664525 * state + 1013904223) >>> 0
+    return state / 0x1_0000_0000
+  }
+}
 
 describe('resolveDecision', () => {
   it('returns conclude_variant when prob >= 0.95 and lossVariant < 0.005', () => {
@@ -57,6 +68,41 @@ describe('betaCredibleInterval', () => {
 })
 
 describe('computeFullStats', () => {
+  it('exposes uncertainty fields and warns on early data', () => {
+    const stats = computeFullStats(
+      { impressions: EARLY_DATA_MIN_ARM_IMPRESSIONS - 1, conversions: 1 },
+      { impressions: EARLY_DATA_TOTAL_IMPRESSIONS - EARLY_DATA_MIN_ARM_IMPRESSIONS, conversions: 2 },
+      seededRandom(1),
+    )
+
+    expect(stats.totalImpressions).toBe(EARLY_DATA_TOTAL_IMPRESSIONS - 1)
+    expect(stats.observedConversionRates.control).toBeCloseTo(1 / 29)
+    expect(stats.observedConversionRates.variant).toBeCloseTo(2 / 70)
+    expect(stats.credibleIntervalWidths.control).toBeGreaterThan(0)
+    expect(stats.credibleIntervalWidths.variant).toBeGreaterThan(0)
+    expect(stats.warningCodes).toEqual(['early_data'])
+    expect(stats.minimumPracticalLift).toBe(MINIMUM_PRACTICAL_LIFT)
+  })
+
+  it('does not warn once both arms clear the early-data floors', () => {
+    const stats = computeFullStats(
+      { impressions: 50, conversions: 5 },
+      { impressions: 50, conversions: 6 },
+      seededRandom(2),
+    )
+
+    expect(stats.warningCodes).toEqual([])
+  })
+
+  it('supports reproducible seeded Monte Carlo results', () => {
+    const control = { impressions: 100, conversions: 10 }
+    const variant = { impressions: 100, conversions: 20 }
+    const first = computeFullStats(control, variant, seededRandom(3))
+    const second = computeFullStats(control, variant, seededRandom(3))
+
+    expect(second).toEqual(first)
+  })
+
   it('sanity check: variant at 20% vs control at 10% → probVariantWins ~85–95%', () => {
     const { probVariantWins } = computeFullStats(
       { impressions: 100, conversions: 10 },

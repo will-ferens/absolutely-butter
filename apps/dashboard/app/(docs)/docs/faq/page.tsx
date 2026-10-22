@@ -59,13 +59,13 @@ export default function FaqPage() {
           need far fewer visitors to show up than small ones.
         </p>
 
-        <h2>Why does the confidence seem low after two weeks?</h2>
+        <h2>Why is the result still uncertain after two weeks?</h2>
         <p>Usually one of two things:</p>
         <ul>
           <li>
             <strong>Not enough data yet.</strong> With small samples the two
             distributions still overlap, so P(variant &gt; control) sits near 50%.
-            Check the forward projection for the estimated time to 95%.
+            Check the planning estimate for a rough time to a clearer result.
           </li>
           <li>
             <strong>The real difference is small.</strong> If relative lift is only
@@ -103,16 +103,26 @@ export default function FaqPage() {
           page aren&apos;t supported yet. It&apos;s on the roadmap.
         </p>
 
-        <h2>What does &quot;may not reach 95% confidence within 90 days&quot; mean?</h2>
+        <h2>What does &quot;may not produce a clear result within 90 days&quot; mean?</h2>
         <p>
           That&apos;s the forward projection telling you it couldn&apos;t produce a
-          useful estimate. Extrapolating from your traffic rate since launch and
-          the conversion rates so far, the experiment isn&apos;t on track to reach
-          95% confidence inside a 90-day window — so rather than show a number you
-          can&apos;t plan around, it says so plainly. The usual causes are low
-          traffic or a very small difference between the arms. Options: send more
-          traffic to the tested surface, accept a directional read, or conclude on
-          the relative lift if it&apos;s already big enough to act on.
+          useful planning estimate. Extrapolating from your traffic rate since
+          launch and the conversion rates so far, the experiment isn&apos;t projected
+          to reach a clear result inside a 90-day window — so rather than show a
+          number you can&apos;t plan around, it says so plainly. The usual causes are
+          low traffic or a very small difference between the arms. Options: send
+          more traffic to the tested surface, accept a directional read, or
+          conclude on the relative lift if it&apos;s already big enough to act on.
+        </p>
+
+        <h2>What does the early-data warning mean?</h2>
+        <p>
+          The warning appears while there are fewer than 100 total impressions or
+          fewer than 30 impressions in either arm. It does not block a conclusion;
+          it reminds you that the posterior distributions and credible intervals
+          are still being shaped by limited exposure. Treat the probability and
+          interval together, and wait for more data when the practical decision is
+          sensitive to a small difference.
         </p>
 
         <h2>Is any of this personally identifiable?</h2>

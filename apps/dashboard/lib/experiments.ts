@@ -12,7 +12,12 @@ export type FullStats = {
   probVariantWins: number
   expectedLoss: { ifChooseVariant: number; ifChooseControl: number }
   relativeLift: number
+  totalImpressions: number
+  observedConversionRates: { control: number; variant: number }
   credibleIntervals: { control: [number, number]; variant: [number, number] }
+  credibleIntervalWidths: { control: number; variant: number }
+  warningCodes: Array<'early_data'>
+  minimumPracticalLift: number
   decision: 'conclude_variant' | 'conclude_control' | 'strong_signal' | 'directional' | 'no_signal'
 }
 
@@ -130,8 +135,8 @@ export function computeAxisScale(
   }
 }
 
-// Returns total days from launch to estimated convergence, or null if won't converge within 90 days.
-export function estimateDaysToSignificance(
+// Returns total days from launch to an estimated clear result, or null if it is not projected within 90 days.
+export function estimateDaysToResult(
   launchedAt: string,
   totalImpressions: number,
   baselineConversionRate: number,
@@ -162,8 +167,21 @@ export function formatRelativeLift(lift: number): string {
   return `${sign}${Math.abs(lift * 100).toFixed(1)}%`
 }
 
+export function computeObservedLift(controlRate: number, variantRate: number): number | null {
+  if (controlRate === 0) return null
+  return (variantRate - controlRate) / controlRate
+}
+
 export function formatExpectedLoss(loss: number): string {
   return `${(loss * 100).toFixed(1)}%`
+}
+
+export function formatRate(rate: number): string {
+  return `${(rate * 100).toFixed(1)}%`
+}
+
+export function hasEarlyDataWarning(stats: Pick<FullStats, 'warningCodes'>): boolean {
+  return stats.warningCodes.includes('early_data')
 }
 
 export function truncateName(name: string, maxLen = 40): string {

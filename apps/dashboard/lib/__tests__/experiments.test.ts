@@ -5,9 +5,12 @@ import {
   formatProb,
   hasSignal,
   computeAxisScale,
-  estimateDaysToSignificance,
+  estimateDaysToResult,
+  computeObservedLift,
   formatRelativeLift,
   formatExpectedLoss,
+  formatRate,
+  hasEarlyDataWarning,
   truncateName,
   type ExperimentWithArms,
   type ExperimentArm,
@@ -170,6 +173,26 @@ describe('formatProb', () => {
   })
 })
 
+describe('uncertainty helpers', () => {
+  it('formats observed conversion rates', () => {
+    expect(formatRate(0.1234)).toBe('12.3%')
+  })
+
+  it('detects early-data warnings', () => {
+    expect(hasEarlyDataWarning({ warningCodes: ['early_data'] })).toBe(true)
+    expect(hasEarlyDataWarning({ warningCodes: [] })).toBe(false)
+  })
+
+  it('returns unavailable when the control conversion rate is zero', () => {
+    expect(computeObservedLift(0, 0)).toBeNull()
+    expect(computeObservedLift(0, 0.1)).toBeNull()
+  })
+
+  it('computes observed lift when the control has conversions', () => {
+    expect(computeObservedLift(0.05, 0.1)).toBeCloseTo(1)
+  })
+})
+
 // ─── hasSignal ────────────────────────────────────────────────────────────────
 
 describe('hasSignal', () => {
@@ -217,9 +240,9 @@ describe('computeAxisScale', () => {
   })
 })
 
-// ─── estimateDaysToSignificance ───────────────────────────────────────────────
+// ─── estimateDaysToResult ────────────────────────────────────────────────────
 
-describe('estimateDaysToSignificance', () => {
+describe('estimateDaysToResult', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-05-21T00:00:00.000Z'))
@@ -228,18 +251,18 @@ describe('estimateDaysToSignificance', () => {
 
   it('returns null when fewer than 2 days elapsed', () => {
     const launchedAt = new Date(Date.now() - 1 * 86_400_000).toISOString()
-    expect(estimateDaysToSignificance(launchedAt, 500, 0.1)).toBeNull()
+    expect(estimateDaysToResult(launchedAt, 500, 0.1)).toBeNull()
   })
 
   it('returns null when fewer than 10 total impressions', () => {
     const launchedAt = new Date(Date.now() - 10 * 86_400_000).toISOString()
-    expect(estimateDaysToSignificance(launchedAt, 5, 0.1)).toBeNull()
+    expect(estimateDaysToResult(launchedAt, 5, 0.1)).toBeNull()
   })
 
   it('returns null when projection exceeds 90 days', () => {
     // Very low traffic: 10 impressions over 10 days = 1/day, needs thousands
     const launchedAt = new Date(Date.now() - 10 * 86_400_000).toISOString()
-    expect(estimateDaysToSignificance(launchedAt, 10, 0.01)).toBeNull()
+    expect(estimateDaysToResult(launchedAt, 10, 0.01)).toBeNull()
   })
 
   it('returns 0 when already have enough impressions', () => {
@@ -247,12 +270,12 @@ describe('estimateDaysToSignificance', () => {
     const launchedAt = new Date(Date.now() - 30 * 86_400_000).toISOString()
     // p=0.5, delta=0.25, needed = 16*0.5*0.5/0.0625 = 64 per arm = 128 total
     // We pass 10000 impressions, far exceeds that
-    expect(estimateDaysToSignificance(launchedAt, 10000, 0.5)).toBe(0)
+    expect(estimateDaysToResult(launchedAt, 10000, 0.5)).toBe(0)
   })
 
   it('returns a positive integer for a realistic scenario', () => {
     const launchedAt = new Date(Date.now() - 14 * 86_400_000).toISOString()
-    const result = estimateDaysToSignificance(launchedAt, 280, 0.1) // 20/day
+    const result = estimateDaysToResult(launchedAt, 280, 0.1) // 20/day
     if (result !== null) {
       expect(result).toBeGreaterThan(0)
       expect(Number.isInteger(result)).toBe(true)

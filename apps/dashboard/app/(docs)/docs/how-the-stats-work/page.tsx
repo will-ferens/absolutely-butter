@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 
 const statsShape = `{
   "probVariantWins": 0.87,
+  "totalImpressions": 240,
+  "observedConversionRates": {
+    "control": 0.052,
+    "variant": 0.070
+  },
   "expectedLoss": {
     "ifChooseVariant": 0.004,
     "ifChooseControl": 0.021
@@ -22,6 +27,12 @@ const statsShape = `{
     "control": [0.031, 0.078],
     "variant": [0.048, 0.101]
   },
+  "credibleIntervalWidths": {
+    "control": 0.047,
+    "variant": 0.053
+  },
+  "warningCodes": [],
+  "minimumPracticalLift": 0.01,
   "decision": "strong_signal"
 }`
 
@@ -82,7 +93,7 @@ beta  = 1 + (impressions − conversions)`}
         <p>
           It is a direct probability about your experiment, not a p-value. <code>0.5</code>{' '}
           means the data can&apos;t yet tell the arms apart. <code>0.95</code>+ or{' '}
-          <code>0.05</code>− is where the dashboard flags a strong result.
+          <code>0.05</code>− is where the dashboard flags a strong posterior result.
         </p>
 
         <h2>Expected loss</h2>
@@ -161,17 +172,17 @@ beta  = 1 + (impressions − conversions)`}
         <ul>
           <li>your <strong>traffic rate since launch</strong> — total impressions divided by days elapsed;</li>
           <li>the <strong>pooled conversion rate</strong> observed so far;</li>
-          <li>a sample-size estimate for reaching 95% confidence, scaled to the effect size the data suggests.</li>
+          <li>a rough sample-size estimate for reaching a clear result, scaled to the effect size the data suggests.</li>
         </ul>
         <p>It has guard rails:</p>
         <ul>
           <li>Nothing is shown in the first 2 days or under 10 total impressions — too little to extrapolate from.</li>
-          <li>If the projection lands beyond 90 days, the dashboard says the experiment <em>may not reach 95% confidence within 90 days</em> rather than printing a number you can&apos;t act on.</li>
+          <li>If the projection lands beyond 90 days, the dashboard says the experiment <em>may not produce a clear result within 90 days</em> rather than printing a number you can&apos;t act on.</li>
           <li>Once the probability crosses 0.95 or 0.05, the projection disappears — you&apos;re there.</li>
         </ul>
         <p>
-          It is a planning aid built from current velocity, not a promise. Real
-          traffic and conversion rates move.
+          It is a frequentist planning heuristic built from current velocity, not a
+          posterior conclusion or a promise. Real traffic and conversion rates move.
         </p>
 
         <h2>The full object</h2>

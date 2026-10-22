@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { formatRelativeLift, formatExpectedLoss, decisionLabel } from '@/lib/experiments'
+import { computeObservedLift, formatRelativeLift, formatExpectedLoss, decisionLabel } from '@/lib/experiments'
 import type { ExperimentDetail, FullStats } from '@/lib/experiments'
 import HeadlineNumber from '@/components/experiments/HeadlineNumber'
 import IntervalPlot from '@/components/experiments/IntervalPlot'
@@ -142,6 +142,13 @@ export default function ExperimentDetailClient({ experiment: initial, snippet, i
   const isDraft = exp.status === 'draft'
   const isInactive = exp.status === 'inactive'
   const canWrite = isActive || exp.status === 'draft'
+  const totalImpressions = stats?.totalImpressions ?? ((control?.impressions ?? 0) + (variant?.impressions ?? 0))
+  const controlRate = stats?.observedConversionRates?.control ?? (control && control.impressions > 0 ? control.conversions / control.impressions : 0)
+  const variantRate = stats?.observedConversionRates?.variant ?? (variant && variant.impressions > 0 ? variant.conversions / variant.impressions : 0)
+  const observedLift = computeObservedLift(controlRate, variantRate)
+  const hasEarlyDataWarning = stats?.warningCodes?.includes('early_data') ?? (
+    totalImpressions < 100 || (control?.impressions ?? 0) < 30 || (variant?.impressions ?? 0) < 30
+  )
 
   return (
     <div className="space-y-6">
@@ -253,6 +260,13 @@ export default function ExperimentDetailClient({ experiment: initial, snippet, i
         <SnippetDisplay snippet={snippet} />
       )}
 
+      {stats && hasEarlyDataWarning && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+          Early data: this result is still uncertain. There are {totalImpressions.toLocaleString()} total impressions;
+          results become easier to interpret as both arms collect more exposure.
+        </div>
+      )}
+
       {/* Concluded banner */}
       {isInactive && exp.conclusion && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800">
@@ -260,7 +274,7 @@ export default function ExperimentDetailClient({ experiment: initial, snippet, i
           · {decisionLabel(exp.conclusion.decision)}{' '}
           {stats && (
             <>
-              · Final confidence: {Math.round(stats.probVariantWins * 100)}%
+              · Final posterior probability: {Math.round(stats.probVariantWins * 100)}%
               · Relative lift: {formatRelativeLift(stats.relativeLift)}
             </>
           )}
@@ -280,6 +294,8 @@ export default function ExperimentDetailClient({ experiment: initial, snippet, i
             status={exp.status}
             controlImpressions={control.impressions}
             variantImpressions={variant.impressions}
+            controlRate={controlRate}
+            variantRate={variantRate}
           />
 
           <IntervalPlot control={control} variant={variant} stats={stats} />
@@ -287,9 +303,9 @@ export default function ExperimentDetailClient({ experiment: initial, snippet, i
           {/* Supporting numbers */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 rounded-lg px-4 py-3">
-              <p className="text-xs text-gray-400 mb-1">Relative lift</p>
+              <p className="text-xs text-gray-400 mb-1">Observed lift</p>
               <p className="text-lg font-semibold text-gray-900">
-                {formatRelativeLift(stats.relativeLift)}
+                {observedLift === null ? 'Not available' : formatRelativeLift(observedLift)}
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg px-4 py-3">

@@ -43,7 +43,7 @@ export default function DecisionBanner({ experimentId, stats }: Props) {
         <div>
           {isVariantWinning && (
             <p className="text-sm font-medium text-green-900">
-              Strong signal detected. Variant is likely better.{' '}
+              Strong posterior signal. Variant is likely better.{' '}
               <span className="font-normal text-green-700">
                 Expected downside if you ship: {formatExpectedLoss(expectedLoss.ifChooseVariant)}
               </span>
@@ -51,12 +51,12 @@ export default function DecisionBanner({ experimentId, stats }: Props) {
           )}
           {isControlWinning && (
             <p className="text-sm font-medium text-red-900">
-              Variant is underperforming. Control is likely better.
+              Strong posterior signal. Control is likely better.
             </p>
           )}
           {!isVariantWinning && !isControlWinning && (
             <p className="text-sm font-medium text-gray-800">
-              Strong signal detected — P(B&gt;A) = {Math.round(probVariantWins * 100)}%
+              Strong posterior signal — variant wins in {Math.round(probVariantWins * 100)}% of plausible outcomes.
             </p>
           )}
         </div>
