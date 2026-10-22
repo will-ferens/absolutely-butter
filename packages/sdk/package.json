@@ -1,6 +1,6 @@
 {
   "name": "@absolutely-butter/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A zero-dependency browser SDK for Absolutely Butter experiments.",
   "author": "Will Ferens",
   "license": "UNLICENSED",
